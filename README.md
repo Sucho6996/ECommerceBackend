@@ -1,6 +1,6 @@
 # eCommerce Backend API
 
-This project is an eCommerce backend API built using Spring Boot and Spring Security. The application is divided into multiple microservices: Product, Seller, Customer, and Order. The database used is PostgreSQL.
+This project is an Ecommerce Backend API built using Spring Boot and Spring Security. The application is divided into multiple microservices: Product, Seller, Customer, and Order. The database used is PostgreSQL. in this project the `Product` service and `Order` service will only be accessed through `Seller` and `Customer` service. The payment endpoint used is `Razorpay`.
 
 ## Table of Contents
 
@@ -18,6 +18,7 @@ This project is an eCommerce backend API built using Spring Boot and Spring Secu
 - User authentication and authorization using Spring Security
 - CRUD operations for products, sellers, customers, and orders
 - Microservices architecture for scalability and maintainability
+- Integration with Razorpay for handling transactions.
 - PostgreSQL database integration
 - Secure API endpoints
 
@@ -29,6 +30,7 @@ This project is an eCommerce backend API built using Spring Boot and Spring Secu
 - Spring Data JPA
 - PostgreSQL
 - Maven
+- Razorpay API
 - Docker (optional for containerization)
 
 ## Architecture
@@ -49,6 +51,7 @@ Each microservice has its own database schema and communicates with other servic
 - Java 11 or higher
 - Maven
 - PostgreSQL
+- Razorpay
 - Docker (optional)
 
 ### Installation
@@ -107,40 +110,69 @@ You can use Docker to containerize the microservices. Ensure Docker is installed
 ### Accessing the API
 
 Each microservice runs on a different port:
-- Product Service: `http://localhost:8081`
-- Seller Service: `http://localhost:8082`
-- Customer Service: `http://localhost:8083`
-- Order Service: `http://localhost:8084`
+- Product Service: `http://localhost:8080`
+- Seller Service: `http://localhost:8081`
+- Customer Service: `http://localhost:8090`
+- Order Service: `http://localhost:9090`
 
 ### API Endpoints
 
-#### Product Service
-- `GET /products`: Retrieve all products
-- `POST /products`: Create a new product
-- `GET /products/{id}`: Retrieve a product by ID
-- `PUT /products/{id}`: Update a product by ID
-- `DELETE /products/{id}`: Delete a product by ID
+**Product Service**
+`Base URL`
+/product
 
-#### Seller Service
+Endpoints
+-`GET /findAll`: Retrieve all products.
+-`POST /add`: Create a new product.
+-`GET /find/{id}`: Retrieve a product by ID.
+-`GET /search/{keyword}`: Retrieve products based on a keyword search.
+-`GET /image/{id}`: Retrieve a product image by ID.
+-`PUT /modify`: Update a product by ID.
+-`DELETE /delete/{id}`: Delete a product by ID.
+
+**Seller Service**
+`Base URL`
+/seller
 - `GET /sellers`: Retrieve all sellers
 - `POST /sellers`: Create a new seller
 - `GET /sellers/{id}`: Retrieve a seller by ID
 - `PUT /sellers/{id}`: Update a seller by ID
 - `DELETE /sellers/{id}`: Delete a seller by ID
 
-#### Customer Service
-- `GET /customers`: Retrieve all customers
-- `POST /customers`: Create a new customer
-- `GET /customers/{id}`: Retrieve a customer by ID
-- `PUT /customers/{id}`: Update a customer by ID
-- `DELETE /customers/{id}`: Delete a customer by ID
+**Customer Service**
+`Base URL`
+/user
 
-#### Order Service
-- `GET /orders`: Retrieve all orders
-- `POST /orders`: Create a new order
-- `GET /orders/{id}`: Retrieve an order by ID
-- `PUT /orders/{id}`: Update an order by ID
-- `DELETE /orders/{id}`: Delete an order by ID
+Endpoints
+-`POST /signin`: Register a new user.
+-`POST /login`: Authenticate a user and return a JWT token.
+-`GET /findAll`: Retrieve all products.
+-`GET /find/{id}`: Retrieve a product by ID.
+-`GET /search/{keyword}`: Retrieve products based on a keyword search.
+-`GET /order`: Place an order with parameters for product ID, seller name, price, and phone number.
+-`GET /cart`: Add a product to the cart with parameters for product ID, seller name, price, and phone number.
+-`GET /view/{id}`: Retrieve user details by user ID (phone number).
+-`GET /orders/{id}`: Retrieve all orders for a user by user ID (phone number).
+-`GET /carts/{id}`: Retrieve all cart items for a user by user ID (phone number).
+-`GET /order/{id}`: Retrieve order details by order ID.
+-`GET /cart/{id}`: Retrieve cart details by cart ID.
+-`POST /save`: Save user details.
+
+**Order Service**
+`Base URL`
+/order&cart
+
+Endpoints
+-`GET /view/orders/{id}`: Retrieve all orders for a user by user ID.
+-`GET /view/carts/{id}`: Retrieve all cart items for a user by user ID.
+-`GET /view/orderDetails/{id}`: Retrieve order details by order ID.
+-`GET /view/cartDetails/{id}`: Retrieve cart details by cart ID.
+-`POST /create/order`: Create a new order with product details (integrated with Razorpay for payment).
+-`POST /paymentCallback`: Update order status based on the payment response (callback from Razorpay).
+-`POST /save/cart`: Add a product to the cart with product details.
+-`GET /user/{phNo}`: Retrieve user details by phone number.
+-`GET /seller/{sellername}`: Retrieve seller details by seller name.
+-`GET /product/{pId}`: Retrieve product details by product ID.
 
 ## Contributing
 
