@@ -23,5 +23,6 @@ public class Orders {
     private String sellerName;
     private String phoneNo;
     private BigDecimal productPrice;
-    final private String PaymentMethod="COD";
+    private String orderStatus;
+    private String razorpayOrderId;
 }

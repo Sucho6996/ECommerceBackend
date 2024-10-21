@@ -26,7 +26,7 @@ public interface OrderFeign {
 
     @GetMapping("/view/cartDetails/{id}")
     public ResponseEntity<Cart> viewCart(@PathVariable int id);
-    @PostMapping("order&cart/save/order")
+    @PostMapping("order&cart/create/order")
     public ResponseEntity<String> saveOrder(@RequestBody ProductDetails productDetails);
 
     @PostMapping("order&cart/save/cart")

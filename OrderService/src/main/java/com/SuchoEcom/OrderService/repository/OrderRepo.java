@@ -13,4 +13,6 @@ public interface OrderRepo extends JpaRepository<Orders,Integer> {
     Optional<Orders> findByphoneNo(String id);
 
     List<Orders> findAllByphoneNo(String id);
+
+    Orders findByrazorpayOrderId(String razorpayId);
 }

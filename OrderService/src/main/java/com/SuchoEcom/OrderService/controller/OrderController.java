@@ -3,11 +3,13 @@ package com.SuchoEcom.OrderService.controller;
 
 import com.SuchoEcom.OrderService.model.*;
 import com.SuchoEcom.OrderService.service.OrderService;
+import com.razorpay.RazorpayException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("order&cart")
@@ -34,9 +36,13 @@ public class OrderController {
         return orderService.viewCart(id);
     }
 
-    @PostMapping("/save/order")
-    public ResponseEntity<String> saveOrder(@RequestBody ProductDetails productDetails){
+    @PostMapping("/create/order")
+    public ResponseEntity<String> saveOrder(@RequestBody ProductDetails productDetails) throws RazorpayException {
         return orderService.saveOder(productDetails);
+    }
+    @PostMapping("/paymentCallback")
+    public ResponseEntity<String> updateOrder(@RequestParam String response) throws RazorpayException {
+        return orderService.updateOrder(response);
     }
 
     @PostMapping("/save/cart")
