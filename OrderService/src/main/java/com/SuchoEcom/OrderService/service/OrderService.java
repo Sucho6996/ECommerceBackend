@@ -113,6 +113,14 @@ public class OrderService {
         Orders order=orderRepo.findByrazorpayOrderId(razorpayId);
         order.setOrderStatus("Payment Done");
         orderRepo.save(order);
+        //update seller earnings after buying
+        sellerFeign.internalUpdate(order.getSellerName(),order.getProductPrice());
+
+        //Reduce product quantity
+        Product product=productFeign.findById(order.getProductId()).getBody();
+        product.setProductQuantity(product.getProductQuantity()-1);
+        productFeign.modifyProduct(product);
+
         return new ResponseEntity<>("Payment Done!!", HttpStatus.OK);
     }
 

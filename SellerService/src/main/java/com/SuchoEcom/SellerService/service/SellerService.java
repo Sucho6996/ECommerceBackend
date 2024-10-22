@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,6 +77,21 @@ public class SellerService {
 
     public ResponseEntity<Seller> getSeller(String name) {
         return new ResponseEntity<>(sellerRepo.findBysellername(name),HttpStatus.OK);
+    }
+
+    public ResponseEntity<String> update(Seller seller) {
+        Seller seller1=sellerRepo.findBysellername(seller.getSellername());
+        //seller1.setEarning(seller.getEarning());
+        sellerRepo.save(seller1);
+        return new ResponseEntity<>("updated!!",HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<String> internalUpdate(String name, BigDecimal amount) {
+        Seller seller=sellerRepo.findBysellername(name);
+        seller.setEarning(seller.getEarning().add(amount));
+        sellerRepo.save(seller);
+        return new ResponseEntity<>("Amount updated",HttpStatus.OK);
     }
 }
 

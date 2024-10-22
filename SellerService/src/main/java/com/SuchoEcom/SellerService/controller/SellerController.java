@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -31,6 +32,11 @@ public class SellerController {
 
     @GetMapping("/seller/{sellername}")
     public ResponseEntity<Seller> getSeller(@PathVariable("sellername") String  name){
+        return service.getSeller(name);
+    }
+
+    @GetMapping("internal/seller/{sellername}")
+    public ResponseEntity<Seller> internalGetSeller(@PathVariable("sellername") String  name){
         return service.getSeller(name);
     }
 
@@ -56,6 +62,15 @@ public class SellerController {
             return new ResponseEntity<>("Invalid credentials!!!", HttpStatus.UNAUTHORIZED);
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<String> update(@RequestBody Seller seller){
+        return service.update(seller);
+    }
+    @PostMapping("internal/update")
+    public ResponseEntity<String> internalUpdate
+            (@RequestParam("name") String name, @RequestParam("amount") BigDecimal amount){
+        return service.internalUpdate(name,amount);
+    }
 
     @PostMapping("/add")
     public ResponseEntity<String> addProduct
@@ -63,15 +78,15 @@ public class SellerController {
         return service.addProduct(product,imageFile);
     }
 
-    @PutMapping("/modify")
-    public ResponseEntity<String> updateProduct
-            (@RequestPart Product product,@RequestPart MultipartFile imageFile){
-        return service.UpdateProduct(product,imageFile);
-    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable int id){
         return service.deleteProduct(id);
     }
 
+    @PutMapping("/modify")
+    public ResponseEntity<String> updateProduct
+            (@RequestPart Product product,@RequestPart MultipartFile imageFile){
+        return service.UpdateProduct(product,imageFile);
+    }
 }
