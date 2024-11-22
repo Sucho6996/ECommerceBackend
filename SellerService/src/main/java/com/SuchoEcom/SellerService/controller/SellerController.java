@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/seller")
@@ -36,56 +38,64 @@ public class SellerController {
     }
 
     @GetMapping("internal/seller/{sellername}")
-    public ResponseEntity<Seller> internalGetSeller(@PathVariable("sellername") String  name){
+    public ResponseEntity<Seller> internalGetSeller(@RequestHeader("Authorization") String authToken){
+        String token=authToken.substring(7);
+        String name= jwtService.extractUserName(token);
         return service.getSeller(name);
     }
 
     @GetMapping("/find/{sellerName}")
-    public ResponseEntity<List<Product>> sellerView(@PathVariable String sellerName){
+    public ResponseEntity<List<Product>> sellerView(@RequestHeader("Authorization") String authToken){
+        String token=authToken.substring(7);
+        String sellerName= jwtService.extractUserName(token);
         return service.sellerView(sellerName);
     }
 
 
     @PostMapping("/signin")
-    public ResponseEntity<String> signIn(@RequestBody Seller seller){
+    public ResponseEntity<Map<String,String>> signIn(@RequestBody Seller seller){
         return service.addSeller(seller);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Seller seller){
+    public ResponseEntity<Map<String,String>> login(@RequestBody Seller seller){
+        Map<String,String> response=new HashMap<>();
         Authentication auth=authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(seller.getSellername(),seller.getPassword()));
         if (auth.isAuthenticated()){
-            return new ResponseEntity<>(jwtService.generateToken(seller.getSellername()),HttpStatus.OK);
+            response.put("message",jwtService.generateToken(seller.getSellername()));
+            return new ResponseEntity<>(response,HttpStatus.OK);
         }
-        else
-            return new ResponseEntity<>("Invalid credentials!!!", HttpStatus.UNAUTHORIZED);
+        else {
+            response.put("message","Invalid credentials!!!");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PostMapping("/update")
-    public ResponseEntity<String> update(@RequestBody Seller seller){
+    public ResponseEntity<Map<String,String>>  update(@RequestBody Seller seller){
         return service.update(seller);
     }
     @PostMapping("internal/update")
-    public ResponseEntity<String> internalUpdate
+    public ResponseEntity<Map<String,String>> internalUpdate
             (@RequestParam("name") String name, @RequestParam("amount") BigDecimal amount){
         return service.internalUpdate(name,amount);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> addProduct
+    public ResponseEntity<Map<String,String>> addProduct
             (@RequestPart ProductDetails product,@RequestPart MultipartFile imageFile){
         return service.addProduct(product,imageFile);
     }
 
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable int id){
+    public ResponseEntity<Map<String,String>> deleteProduct(@PathVariable int id){
         return service.deleteProduct(id);
     }
 
     @PutMapping("/modify")
-    public ResponseEntity<String> updateProduct
+    public ResponseEntity<Map<String,String>> updateProduct
             (@RequestPart Product product,@RequestPart MultipartFile imageFile){
         return service.UpdateProduct(product,imageFile);
     }

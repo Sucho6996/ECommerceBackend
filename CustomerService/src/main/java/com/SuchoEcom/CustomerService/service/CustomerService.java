@@ -12,7 +12,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CustomerService {
@@ -25,6 +27,8 @@ public class CustomerService {
 
     @Autowired
     UserRepo repo;
+    @Autowired
+    JwtService jwtService;
 
     private BCryptPasswordEncoder encoder=new BCryptPasswordEncoder(12);
     public ResponseEntity<List<Product>> findAll() {
@@ -41,23 +45,27 @@ public class CustomerService {
     }
 
 
-    public ResponseEntity<String> order(Integer id, String name, BigDecimal price, String p) {
+    public ResponseEntity<Map<String,String>> order(Integer id, String name, BigDecimal price, String p) {
+        Map<String,String> response=new HashMap<>();
         ProductDetails productDetails=new ProductDetails();
         productDetails.setProductId(id);
         productDetails.setSellerName(name);
         productDetails.setProductPrice(price);
         productDetails.setPhoneNo(p);
-        return orderFeign.saveOrder(productDetails);
+        response.put("message",orderFeign.saveOrder(productDetails).getBody());
+        return new ResponseEntity<>(response,HttpStatus.OK);
 
     }
 
-    public ResponseEntity<String> cart(Integer id, String name,BigDecimal price, String p) {
+    public ResponseEntity<Map<String,String>> cart(Integer id, String name,BigDecimal price, String p) {
+        Map<String,String> response=new HashMap<>();
         ProductDetails productDetails=new ProductDetails();
         productDetails.setProductId(id);
         productDetails.setSellerName(name);
         productDetails.setProductPrice(price);
         productDetails.setPhoneNo(p);
-        return orderFeign.saveCart(productDetails);
+        response.put("message",orderFeign.saveCart(productDetails).getBody());
+        return new ResponseEntity<>(response,HttpStatus.OK);
 
     }
 
@@ -86,9 +94,11 @@ public class CustomerService {
         return new ResponseEntity<>(orderFeign.viewCart(id).getBody(),HttpStatus.OK);
     }
 
-    public ResponseEntity<String> addUser(Users user) {
+    public ResponseEntity<Map<String,String>> addUser(Users user) {
+        Map<String,String> response=new HashMap<>();
         user.setPassword(encoder.encode(user.getPassword()));
         repo.save(user);
-        return new ResponseEntity<>("Account Created",HttpStatus.CREATED);
+        response.put("message","Account Created");
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
 }

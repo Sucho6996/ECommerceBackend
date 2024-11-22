@@ -13,7 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("user")
@@ -28,19 +30,23 @@ public class CustomerController {
 
 
     @PostMapping("/signin")
-    public ResponseEntity<String> signIn(@RequestBody Users user){
+    public ResponseEntity<Map<String,String>> signIn(@RequestBody Users user){
         return service.addUser(user);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Users user){
+    public ResponseEntity<Map<String,String>>login(@RequestBody Users user){
+        Map<String,String> response=new HashMap<>();
         Authentication auth=authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword()));
         if (auth.isAuthenticated()){
-            return new ResponseEntity<>(jwtService.generateToken(user.getUsername()), HttpStatus.OK);
+            response.put("token",jwtService.generateToken(user.getUsername()));
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        else
-            return new ResponseEntity<>("Invalid credentials!!!", HttpStatus.UNAUTHORIZED);
+        else {
+            response.put("token","Invalid credentials!!!");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
     }
 
 
@@ -61,28 +67,44 @@ public class CustomerController {
     }
 
     @GetMapping("/order")
-    public ResponseEntity<String> order
-            (@RequestParam("pId") Integer id, @RequestParam("sellerName") String name, @RequestParam("price") BigDecimal price, @RequestParam("phNo") String p){
+    public ResponseEntity<Map<String,String>>order
+            (@RequestParam("pId") Integer id,
+             @RequestParam("sellerName") String name,
+             @RequestParam("price") BigDecimal price,
+             @RequestHeader("Authorization") String authToken){
+        String token=authToken.substring(7);
+        String p= jwtService.extractUserName(token);
         return service.order(id,name,price,p);
     }
 
     @GetMapping("/cart")
-    public ResponseEntity<String> cart
-            (@RequestParam("pId") Integer id,@RequestParam("sellerName") String name,@RequestParam("price") BigDecimal price,@RequestParam("phNo") String p){
+    public ResponseEntity<Map<String,String>> cart
+            (@RequestParam("pId") Integer id,
+             @RequestParam("sellerName") String name,
+             @RequestParam("price") BigDecimal price,
+             @RequestHeader("Authorization") String authToken){
+        String token=authToken.substring(7);
+        String p= jwtService.extractUserName(token);
         return service.cart(id,name,price,p);
     }
 
     @GetMapping("/view/{id}")
-    public ResponseEntity<Users> getUserDetails(@PathVariable("id") String ph){
+    public ResponseEntity<Users> getUserDetails(@RequestHeader("Authorization") String authToken){
+        String token=authToken.substring(7);
+        String ph=jwtService.extractUserName(token);
         return service.getUserDetails(ph);
     }
 
     @GetMapping("/orders/{id}")
-    public ResponseEntity<List<Orders>> getOrders(@PathVariable("id") String ph){
+    public ResponseEntity<List<Orders>> getOrders(@RequestHeader("Authorization") String authToken){
+        String token=authToken.substring(7);
+        String ph=jwtService.extractUserName(token);
         return service.getOrders(ph);
     }
     @GetMapping("/carts/{id}")
-    public ResponseEntity<List<Cart>> getCarts(@PathVariable("id") String ph){
+    public ResponseEntity<List<Cart>> getCarts(@RequestHeader("Authorization") String authToken){
+        String token=authToken.substring(7);
+        String ph=jwtService.extractUserName(token);
         return service.getCarts(ph);
     }
 

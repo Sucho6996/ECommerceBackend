@@ -15,7 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SellerService {
@@ -26,23 +28,29 @@ public class SellerService {
     SellerRepo sellerRepo;
 
     private BCryptPasswordEncoder encoder=new BCryptPasswordEncoder(12);
-    public ResponseEntity<String> addSeller(Seller seller) {
-      seller.setPassword(encoder.encode(seller.getPassword()));
-      sellerRepo.save(seller);
-      return new ResponseEntity<>("Account Created",HttpStatus.CREATED);
+    public ResponseEntity<Map<String,String>> addSeller(Seller seller) {
+        Map<String,String> response=new HashMap<>();
+        seller.setPassword(encoder.encode(seller.getPassword()));
+        sellerRepo.save(seller);
+        response.put("message","Account Created");
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
-    public ResponseEntity<String> addProduct(ProductDetails productDetails, MultipartFile imageFile) {
-                productDetails.setImageName(imageFile.getName());
-                productDetails.setImageType(imageFile.getContentType());
-                try {
-                    productDetails.setImage(imageFile.getBytes());
-                } catch (IOException e) {
-                    return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-                }
-                String m=productFeign.addProduct(productDetails);
-                return new ResponseEntity<>(m, HttpStatus.CREATED);
+    public ResponseEntity<Map<String,String>> addProduct(ProductDetails productDetails, MultipartFile imageFile) {
+        Map<String,String> response=new HashMap<>();
+        productDetails.setImageName(imageFile.getName());
+        productDetails.setImageType(imageFile.getContentType());
+        try {
+            productDetails.setImage(imageFile.getBytes());
+        } catch (IOException e) {
+            response.put("message",e.getMessage());
+            return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+        }
+        String m=productFeign.addProduct(productDetails);
+        response.put("message",m);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-    public ResponseEntity<String> UpdateProduct(Product product, MultipartFile imageFile) {
+    public ResponseEntity<Map<String,String>> UpdateProduct(Product product, MultipartFile imageFile) {
+        Map<String,String> response=new HashMap<>();
         List<Seller> sellers=sellerRepo.findAll();
         for (Seller seller:sellers){
             if(seller.getSellername().equals(product.getSellerName())) {
@@ -51,13 +59,16 @@ public class SellerService {
                 try {
                     product.setImage(imageFile.getBytes());
                 } catch (IOException e) {
-                    return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+                    response.put("message",e.getMessage());
+                    return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
                 }
                 String m=productFeign.modifyProduct(product);
-                return new ResponseEntity<>(m, HttpStatus.CREATED);
+                response.put("message",m);
+                return new ResponseEntity<>(response, HttpStatus.CREATED);
             }
         }
-        return new ResponseEntity<>("Seller isn't registered",HttpStatus.NOT_ACCEPTABLE);
+        response.put("message","Seller isn't registered");
+        return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<List<Product>> sellerView(String sellerName) {
@@ -71,27 +82,33 @@ public class SellerService {
         return new ResponseEntity<>(productDetails,HttpStatus.FOUND);
     }
 
-    public ResponseEntity<String> deleteProduct(int id) {
-        return productFeign.deleteById(id);
+    public ResponseEntity<Map<String,String>> deleteProduct(int id) {
+        Map<String,String> response=new HashMap<>();
+        response.put("message",productFeign.deleteById(id).getBody());
+        return new ResponseEntity<>(response,HttpStatus.OK) ;
     }
 
     public ResponseEntity<Seller> getSeller(String name) {
         return new ResponseEntity<>(sellerRepo.findBysellername(name),HttpStatus.OK);
     }
 
-    public ResponseEntity<String> update(Seller seller) {
+    public ResponseEntity<Map<String,String>>  update(Seller seller) {
+        Map<String,String> response=new HashMap<>();
         Seller seller1=sellerRepo.findBysellername(seller.getSellername());
         //seller1.setEarning(seller.getEarning());
         sellerRepo.save(seller1);
-        return new ResponseEntity<>("updated!!",HttpStatus.OK);
+        response.put("message","updated!!");
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
 
-    public ResponseEntity<String> internalUpdate(String name, BigDecimal amount) {
+    public ResponseEntity<Map<String,String>> internalUpdate(String name, BigDecimal amount) {
+        Map<String,String> response=new HashMap<>();
         Seller seller=sellerRepo.findBysellername(name);
         seller.setEarning(seller.getEarning().add(amount));
         sellerRepo.save(seller);
-        return new ResponseEntity<>("Amount updated",HttpStatus.OK);
+        response.put("message","Amount updated");
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }
 
