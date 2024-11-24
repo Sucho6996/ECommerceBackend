@@ -41,29 +41,51 @@ public class CustomerService {
     }
 
     public ResponseEntity<List<Product>> findByKeyword(String keyword) {
-        return new ResponseEntity<>(feign.findByKeyword(keyword).getBody(),HttpStatus.OK);
+        List<Product> products=feign.findByKeyword(keyword).getBody();
+        if(products!=null)
+            return new ResponseEntity<>(products,HttpStatus.OK);
+        else
+            return new ResponseEntity<>(products,HttpStatus.NO_CONTENT);
     }
 
 
-    public ResponseEntity<Map<String,String>> order(Integer id, String name, BigDecimal price, String p) {
+    public ResponseEntity<Map<String,String>> order(Integer id,String ph) {
+        Product product=new Product();
+        product=feign.findById(id).getBody();
         Map<String,String> response=new HashMap<>();
         ProductDetails productDetails=new ProductDetails();
-        productDetails.setProductId(id);
-        productDetails.setSellerName(name);
-        productDetails.setProductPrice(price);
-        productDetails.setPhoneNo(p);
+        productDetails.setProductId(product.getProductId());
+        productDetails.setSellerName(product.getSellerName());
+        productDetails.setProductPrice(product.getProductPrice());
+        productDetails.setPhoneNo(ph);
+        try {
+            productDetails.setImage(product.getImage());
+        }
+        catch (Exception e){
+            response.put("message",e.getMessage());
+            return new ResponseEntity<>(response,HttpStatus.OK);
+        }
         response.put("message",orderFeign.saveOrder(productDetails).getBody());
         return new ResponseEntity<>(response,HttpStatus.OK);
 
     }
 
-    public ResponseEntity<Map<String,String>> cart(Integer id, String name,BigDecimal price, String p) {
+    public ResponseEntity<Map<String,String>> cart(Integer id, String ph) {
+        Product product=new Product();
+        product=feign.findById(id).getBody();
         Map<String,String> response=new HashMap<>();
         ProductDetails productDetails=new ProductDetails();
-        productDetails.setProductId(id);
-        productDetails.setSellerName(name);
-        productDetails.setProductPrice(price);
-        productDetails.setPhoneNo(p);
+        productDetails.setProductId(product.getProductId());
+        productDetails.setSellerName(product.getSellerName());
+        productDetails.setProductPrice(product.getProductPrice());
+        productDetails.setPhoneNo(ph);
+        try {
+            productDetails.setImage(product.getImage());
+        }
+        catch (Exception e){
+            response.put("message",e.getMessage());
+            return new ResponseEntity<>(response,HttpStatus.NO_CONTENT);
+        }
         response.put("message",orderFeign.saveCart(productDetails).getBody());
         return new ResponseEntity<>(response,HttpStatus.OK);
 

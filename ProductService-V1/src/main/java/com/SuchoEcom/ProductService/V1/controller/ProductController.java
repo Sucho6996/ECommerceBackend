@@ -16,9 +16,9 @@ public class ProductController {
     @Autowired
     ProductService productService;
 
-    @GetMapping("/findAll")
-    public ResponseEntity<List<Product>> findAll(){
-        return productService.findAll();
+    @GetMapping("/findAll/{sellerName}")
+    public ResponseEntity<List<Product>> findAll(@PathVariable String sellerName){
+        return productService.findAll(sellerName);
     }
 
     @GetMapping("/find/{id}")

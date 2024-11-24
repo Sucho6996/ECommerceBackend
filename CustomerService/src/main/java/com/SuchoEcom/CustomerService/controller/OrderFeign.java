@@ -15,16 +15,16 @@ import java.util.List;
 
 @FeignClient("ORDER")
 public interface OrderFeign {
-    @GetMapping("/view/orders/{id}")
+    @GetMapping("order&cart/view/orders/{id}")
     public ResponseEntity<List<Orders>> viewOrders(@PathVariable String id);
 
-    @GetMapping("/view/carts/{id}")
+    @GetMapping("order&cart/view/carts/{id}")
     public ResponseEntity<List<Cart>> viewCarts(@PathVariable String id);
 
-    @GetMapping("/view/orderDetails/{id}")
+    @GetMapping("order&cart/view/orderDetails/{id}")
     public ResponseEntity<Orders> viewOrder(@PathVariable int id);
 
-    @GetMapping("/view/cartDetails/{id}")
+    @GetMapping("order&cart/view/cartDetails/{id}")
     public ResponseEntity<Cart> viewCart(@PathVariable int id);
     @PostMapping("order&cart/create/order")
     public ResponseEntity<String> saveOrder(@RequestBody ProductDetails productDetails);

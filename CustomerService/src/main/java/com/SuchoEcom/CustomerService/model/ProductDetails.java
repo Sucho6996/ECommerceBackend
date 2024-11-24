@@ -1,5 +1,6 @@
 package com.SuchoEcom.CustomerService.model;
 
+import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +18,6 @@ public class ProductDetails {
     private String sellerName;
     private String phoneNo;
     private BigDecimal productPrice;
+    @Lob
+    private byte[] image;
 }

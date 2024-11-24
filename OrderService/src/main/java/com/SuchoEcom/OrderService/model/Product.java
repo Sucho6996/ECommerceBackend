@@ -21,7 +21,7 @@ public class Product {
     private String productBrand;
     private BigDecimal productPrice;
     private String productCat;//->Category
-    private Date productReleaseDate;
+    private String productReleaseDate;
     private int productQuantity;
     private Boolean productAvailable;
     //For Image

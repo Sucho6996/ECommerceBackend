@@ -9,17 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
 public class ProductService {
     @Autowired
     ProductRepo productRepo;
-    public ResponseEntity<List<Product>> findAll() {
-        List<Product> products=productRepo.findAll();
+    public ResponseEntity<List<Product>> findAll(String sellerName) {
+        List<Product> products=productRepo.findAllBysellerName(sellerName);
         if(!products.isEmpty()){
             return new ResponseEntity<>(products, HttpStatus.OK);
         }

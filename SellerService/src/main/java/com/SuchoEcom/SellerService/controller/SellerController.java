@@ -4,6 +4,7 @@ package com.SuchoEcom.SellerService.controller;
 import com.SuchoEcom.SellerService.model.Product;
 import com.SuchoEcom.SellerService.model.ProductDetails;
 import com.SuchoEcom.SellerService.model.Seller;
+import com.SuchoEcom.SellerService.model.SellerLogin;
 import com.SuchoEcom.SellerService.service.JwtService;
 import com.SuchoEcom.SellerService.service.SellerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,38 +33,20 @@ public class SellerController {
     @Autowired
     JwtService jwtService;
 
-    @GetMapping("/seller/{sellername}")
-    public ResponseEntity<Seller> getSeller(@PathVariable("sellername") String  name){
-        return service.getSeller(name);
-    }
-
-    @GetMapping("internal/seller/{sellername}")
-    public ResponseEntity<Seller> internalGetSeller(@RequestHeader("Authorization") String authToken){
-        String token=authToken.substring(7);
-        String name= jwtService.extractUserName(token);
-        return service.getSeller(name);
-    }
-
-    @GetMapping("/find/{sellerName}")
-    public ResponseEntity<List<Product>> sellerView(@RequestHeader("Authorization") String authToken){
-        String token=authToken.substring(7);
-        String sellerName= jwtService.extractUserName(token);
-        return service.sellerView(sellerName);
-    }
-
-
-    @PostMapping("/signin")
-    public ResponseEntity<Map<String,String>> signIn(@RequestBody Seller seller){
+    /*For new seller to register*/
+    @PostMapping("/signup")
+    public ResponseEntity<Map<String,String>> signup(@RequestBody Seller seller){
         return service.addSeller(seller);
     }
 
+    /*For existing seller login*/
     @PostMapping("/login")
-    public ResponseEntity<Map<String,String>> login(@RequestBody Seller seller){
+    public ResponseEntity<Map<String,String>> login(@RequestBody SellerLogin seller){
         Map<String,String> response=new HashMap<>();
         Authentication auth=authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(seller.getSellername(),seller.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(seller.getUsername(),seller.getPassword()));
         if (auth.isAuthenticated()){
-            response.put("message",jwtService.generateToken(seller.getSellername()));
+            response.put("message",jwtService.generateToken(seller.getUsername()));
             return new ResponseEntity<>(response,HttpStatus.OK);
         }
         else {
@@ -72,31 +55,63 @@ public class SellerController {
         }
     }
 
+    /*Seller can see own profile*/
+    @GetMapping("/seller")
+    public ResponseEntity<Seller> GetSeller(@RequestHeader("Authorization") String authToken){
+        String token=authToken.substring(7);
+        String name= jwtService.extractUserName(token);
+        return service.getSeller(name);
+    }
+
+    /*For inter service convo*/
+    @GetMapping("internal/seller")
+    public ResponseEntity<Seller> internalGetSeller(@RequestHeader("Authorization") String authToken){
+        String token=authToken.substring(7);
+        String name= jwtService.extractUserName(token);
+        return service.getSeller(name);
+    }
+
+    /*For seller to see his own products*/
+    @GetMapping("/find")
+    public ResponseEntity<List<Product>> sellerView(@RequestHeader("Authorization") String authToken){
+        String token=authToken.substring(7);
+        String sellerName= jwtService.extractUserName(token);
+        return service.sellerView(sellerName);
+    }
+
+
+    /*Update product*/
     @PostMapping("/update")
     public ResponseEntity<Map<String,String>>  update(@RequestBody Seller seller){
         return service.update(seller);
     }
+
+    /*For inter service convo*/
     @PostMapping("internal/update")
     public ResponseEntity<Map<String,String>> internalUpdate
             (@RequestParam("name") String name, @RequestParam("amount") BigDecimal amount){
         return service.internalUpdate(name,amount);
     }
 
+    /*Adding new product*/
     @PostMapping("/add")
     public ResponseEntity<Map<String,String>> addProduct
-            (@RequestPart ProductDetails product,@RequestPart MultipartFile imageFile){
-        return service.addProduct(product,imageFile);
+            (@RequestHeader("Authorization") String authToken,@RequestPart ProductDetails product,@RequestPart MultipartFile imageFile){
+        String token=authToken.substring(7);
+        String name= jwtService.extractUserName(token);
+        return service.addProduct(name,product,imageFile);
     }
 
-
+    /*Delete a product*/
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Map<String,String>> deleteProduct(@PathVariable int id){
         return service.deleteProduct(id);
     }
 
-    @PutMapping("/modify")
+    /*Modify existing product*/
+    @PutMapping("/modify/{id}")
     public ResponseEntity<Map<String,String>> updateProduct
-            (@RequestPart Product product,@RequestPart MultipartFile imageFile){
-        return service.UpdateProduct(product,imageFile);
+            (@PathVariable int id,@RequestPart Product product,@RequestPart MultipartFile imageFile){
+        return service.UpdateProduct(id,product,imageFile);
     }
 }

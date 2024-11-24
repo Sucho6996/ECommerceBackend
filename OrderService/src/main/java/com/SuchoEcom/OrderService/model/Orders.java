@@ -1,10 +1,7 @@
 package com.SuchoEcom.OrderService.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,5 +21,7 @@ public class Orders {
     private String phoneNo;
     private BigDecimal productPrice;
     private String orderStatus;
+    @Lob
+    private byte[] image;
     private String razorpayOrderId;
 }

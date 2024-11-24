@@ -1,10 +1,7 @@
 package com.SuchoEcom.CustomerService.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,4 +20,6 @@ public class Orders {
     private String phoneNo;
     private BigDecimal productPrice;
     final private String PaymentMethod="COD";
+    @Lob
+    private byte[] image;
 }

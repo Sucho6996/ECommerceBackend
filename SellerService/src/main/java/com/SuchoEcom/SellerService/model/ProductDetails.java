@@ -20,7 +20,7 @@ public class ProductDetails {
     private String productBrand;
     private BigDecimal productPrice;
     private String productCat;//->Category
-    private Date productReleaseDate;
+    private String productReleaseDate;
     private int productQuantity;
     private Boolean productAvailable;
     //For Image
@@ -32,3 +32,18 @@ public class ProductDetails {
 
 
 }
+
+/*
+
+{
+  "productName": "Wireless Mouse",
+  "productDesc": "A high-precision wireless mouse with ergonomic design.",
+  "productBrand": "TechBrand",
+  "productPrice": 29.99,
+  "productCat": "Electronics",
+  "productReleaseDate": "2024-11-01T12:00:00",
+  "productQuantity": 100,
+  "productAvailable": true,
+  "sellerName": "John's Store"
+}
+*/

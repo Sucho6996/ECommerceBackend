@@ -29,11 +29,13 @@ public class CustomerController {
     JwtService jwtService;
 
 
-    @PostMapping("/signin")
+    /*This API is for Signup*/
+    @PostMapping("/signup")
     public ResponseEntity<Map<String,String>> signIn(@RequestBody Users user){
         return service.addUser(user);
     }
 
+    /*API for login*/
     @PostMapping("/login")
     public ResponseEntity<Map<String,String>>login(@RequestBody Users user){
         Map<String,String> response=new HashMap<>();
@@ -50,74 +52,84 @@ public class CustomerController {
     }
 
 
-
+    /*API to get all the available product*/
     @GetMapping("/findAll")
     public ResponseEntity<List<Product>> findAll(){
         return service.findAll();
     }
 
+    /*Use this after user clicking on a product*/
     @GetMapping("/find/{id}")
     public ResponseEntity<Product> findById(@PathVariable Integer id){
         return service.findById(id);
     }
 
+    /*Use for Searching for a product*/
     @GetMapping("/search/{keyword}")
     public ResponseEntity<List<Product>> findByKeyword(@PathVariable String keyword){
         return service.findByKeyword(keyword);
     }
 
+    /*Use for placing an order*/
     @GetMapping("/order")
     public ResponseEntity<Map<String,String>>order
             (@RequestParam("pId") Integer id,
-             @RequestParam("sellerName") String name,
-             @RequestParam("price") BigDecimal price,
              @RequestHeader("Authorization") String authToken){
         String token=authToken.substring(7);
         String p= jwtService.extractUserName(token);
-        return service.order(id,name,price,p);
+        return service.order(id,p);
     }
 
+    /*Use for add to cart*/
     @GetMapping("/cart")
     public ResponseEntity<Map<String,String>> cart
             (@RequestParam("pId") Integer id,
-             @RequestParam("sellerName") String name,
-             @RequestParam("price") BigDecimal price,
              @RequestHeader("Authorization") String authToken){
         String token=authToken.substring(7);
         String p= jwtService.extractUserName(token);
-        return service.cart(id,name,price,p);
+        return service.cart(id,p);
     }
 
-    @GetMapping("/view/{id}")
+    /*Use to show users their details*/
+    @GetMapping("/view")
     public ResponseEntity<Users> getUserDetails(@RequestHeader("Authorization") String authToken){
         String token=authToken.substring(7);
         String ph=jwtService.extractUserName(token);
         return service.getUserDetails(ph);
     }
 
-    @GetMapping("/orders/{id}")
+    /*To see your orders*/
+    @GetMapping("/orders")
     public ResponseEntity<List<Orders>> getOrders(@RequestHeader("Authorization") String authToken){
         String token=authToken.substring(7);
         String ph=jwtService.extractUserName(token);
         return service.getOrders(ph);
     }
-    @GetMapping("/carts/{id}")
+
+    /*To see your cart*/
+    @GetMapping("/carts")
     public ResponseEntity<List<Cart>> getCarts(@RequestHeader("Authorization") String authToken){
         String token=authToken.substring(7);
         String ph=jwtService.extractUserName(token);
         return service.getCarts(ph);
     }
 
+    /*Get details of a particular order*/
     @GetMapping("/order/{id}")
     public ResponseEntity<Orders> getOrder(@PathVariable("id") int id){
         return service.getOrder(id);
     }
 
+    /*Get details of a particular cart item*/
     @GetMapping("/cart/{id}")
     public ResponseEntity<Cart> getCart(@PathVariable("id") int id){
         return service.getCart(id);
     }
 
+    /*
+    Ayse hi bana diya
+    kyu ki sexy lag raha tha
+    */
     @PostMapping("/save")
     public ResponseEntity<String> saveUser(@RequestBody Users user){
         return service.saveUser(user);

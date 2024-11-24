@@ -14,10 +14,21 @@ import org.springframework.boot.context.properties.bind.Name;
 @Entity
 public class Users {
     @Id
-    private String username;
     private String phoneNo;
+    private String username;
     private String password;
     private String name;
     private String address;
     private String role;
 }
+/*
+Model json
+{
+  "username": "string",
+  "phoneNo": "string",
+  "password": "string",
+  "name": "string",
+  "address": "string",
+  "role": "string"
+}
+*/

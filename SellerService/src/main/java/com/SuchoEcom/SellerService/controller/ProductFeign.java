@@ -12,9 +12,11 @@ import java.util.List;
 @FeignClient("PRODUCT")
 public interface ProductFeign {
 
+    @GetMapping("product/findAll/{sellerName}")
+    public ResponseEntity<List<Product>> findAll(@PathVariable String sellerName);
 
-    @GetMapping("product/findAll")
-    public ResponseEntity<List<Product>> findAll();
+    @GetMapping("product/find/{id}")
+    public ResponseEntity<Product> findById(@PathVariable String id);
 
     @GetMapping("product/find/{id}") public ResponseEntity<Product> findById(@PathVariable Integer id);
     @PostMapping("product/add")

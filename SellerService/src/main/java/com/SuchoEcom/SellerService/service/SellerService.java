@@ -14,6 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,10 +38,12 @@ public class SellerService {
         response.put("message","Account Created");
         return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
-    public ResponseEntity<Map<String,String>> addProduct(ProductDetails productDetails, MultipartFile imageFile) {
+    public ResponseEntity<Map<String,String>> addProduct(String name,ProductDetails productDetails, MultipartFile imageFile) {
         Map<String,String> response=new HashMap<>();
+        productDetails.setProductReleaseDate(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
         productDetails.setImageName(imageFile.getName());
         productDetails.setImageType(imageFile.getContentType());
+        productDetails.setSellerName(name);
         try {
             productDetails.setImage(imageFile.getBytes());
         } catch (IOException e) {
@@ -49,13 +54,14 @@ public class SellerService {
         response.put("message",m);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-    public ResponseEntity<Map<String,String>> UpdateProduct(Product product, MultipartFile imageFile) {
+    public ResponseEntity<Map<String,String>> UpdateProduct(int id,Product product, MultipartFile imageFile) {
         Map<String,String> response=new HashMap<>();
-        List<Seller> sellers=sellerRepo.findAll();
-        for (Seller seller:sellers){
-            if(seller.getSellername().equals(product.getSellerName())) {
+        Product product1=productFeign.findById(id).getBody();
+                product.setProductId(id);
                 product.setImageName(imageFile.getName());
                 product.setImageType(imageFile.getContentType());
+                product.setProductReleaseDate(product1.getProductReleaseDate());
+                product.setSellerName(product1.getSellerName());
                 try {
                     product.setImage(imageFile.getBytes());
                 } catch (IOException e) {
@@ -65,21 +71,17 @@ public class SellerService {
                 String m=productFeign.modifyProduct(product);
                 response.put("message",m);
                 return new ResponseEntity<>(response, HttpStatus.CREATED);
-            }
-        }
-        response.put("message","Seller isn't registered");
-        return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<List<Product>> sellerView(String sellerName) {
         List<Product> productDetails=new ArrayList<>();
         List<Product> productDetailsList=new ArrayList<>();
-        productDetailsList=productFeign.findAll().getBody();
+        productDetailsList=productFeign.findAll(sellerName).getBody();
         for (Product p:productDetailsList){
             if(p.getSellerName().equals(sellerName))
                 productDetails.add(p);
         }
-        return new ResponseEntity<>(productDetails,HttpStatus.FOUND);
+        return new ResponseEntity<>(productDetails,HttpStatus.OK);
     }
 
     public ResponseEntity<Map<String,String>> deleteProduct(int id) {

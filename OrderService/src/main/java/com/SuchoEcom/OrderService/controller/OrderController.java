@@ -37,11 +37,13 @@ public class OrderController {
     }
 
     @PostMapping("/create/order")
-    public ResponseEntity<String> saveOrder(@RequestBody ProductDetails productDetails) throws RazorpayException {
+    public ResponseEntity<Map<String,String>> saveOrder(@RequestBody ProductDetails productDetails) throws RazorpayException {
         return orderService.saveOder(productDetails);
     }
+
+    /*Call this after successful payment*/
     @PostMapping("/paymentCallback")
-    public ResponseEntity<String> updateOrder(@RequestParam String response) throws RazorpayException {
+    public ResponseEntity<Map<String,String>> updateOrder(@RequestParam String response) throws RazorpayException {
         return orderService.updateOrder(response);
     }
 
@@ -50,16 +52,19 @@ public class OrderController {
         return orderService.saveCart(productDetails);
     }
 
+    /*See the buyer details from order*/
     @GetMapping("/user/{phNo}")
     public ResponseEntity<Users> getUser(@PathVariable("phNo") String num){
         return orderService.getUser(num);
     }
 
+    /*See the seller details from order*/
     @GetMapping("/seller/{sellername}")
     public ResponseEntity<Seller> getSeller(@PathVariable("sellername") String name){
         return orderService.getSeller(name);
     }
 
+    /*See the product details from order*/
     @GetMapping("/product/{pId}")
     public ResponseEntity<Product> getProduct(@PathVariable int pId){
         return orderService.getProduct(pId);

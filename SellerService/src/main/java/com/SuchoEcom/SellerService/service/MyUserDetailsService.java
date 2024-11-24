@@ -16,8 +16,8 @@ public class MyUserDetailsService implements UserDetailsService {
     @Autowired
     SellerRepo repo;
     @Override
-    public UserDetails loadUserByUsername(String sellername) throws UsernameNotFoundException {
-        Seller seller=repo.findBysellername(sellername);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Seller seller=repo.findByusername(username);
         if (seller==null){
             System.out.println("404 not found");
             throw new UsernameNotFoundException("Username 404");

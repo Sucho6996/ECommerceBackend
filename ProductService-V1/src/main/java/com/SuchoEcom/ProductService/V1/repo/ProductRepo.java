@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepo extends JpaRepository<Product,Integer> {
@@ -18,4 +19,6 @@ public interface ProductRepo extends JpaRepository<Product,Integer> {
             "LOWER(p.productBrand) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(p.productCat) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Product> findByKeyword(String keyword);
+
+    List<Product> findAllBysellerName(String sellerName);
 }

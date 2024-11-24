@@ -22,3 +22,16 @@ public class Seller {
     private String phoneNo;
     private String Role;
 }
+
+/*
+Model Json
+{
+  "username": "Rit123",
+  "sellername": "Suchorit",
+  "password": "suchorit",
+  "earning": 0.0,
+  "address": "Abc lane",
+  "phoneNo": "9230128898",
+  "Role": "Seller"
+}
+*/
